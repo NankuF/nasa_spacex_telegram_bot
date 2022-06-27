@@ -38,3 +38,19 @@ def download_image(url: str, save_path: Path, payload=None, headers=None):
 
     with open(f'{os.path.join(os.sep, save_path, f"{filename}{fetch_file_extension(url)}")}', 'wb') as file:
         file.write(resp.content)
+
+
+def save_image_urls(url: str, path: Path):
+    path = Path(os.path.join(os.sep, path, 'urls.txt'))
+    with open(path, 'a') as file:
+        file.write(url + '\n')
+
+
+def read_dirs(path: str) -> [str]:
+    """Получает путь к файлам в директории и во вложенных директориях"""
+    path = Path(os.path.join(os.sep, os.getcwd(), path))
+    images = []
+    for top, dirs, files in os.walk(path):
+        for nm in files:
+            images.append(os.path.join(os.sep, top, nm))
+    return images
