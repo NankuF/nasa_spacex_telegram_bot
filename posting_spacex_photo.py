@@ -11,22 +11,23 @@ from utils import read_dirs
 env = environs.Env()
 env.read_env()
 token = env.str('TG_TOKEN')
+chat_id = env.str('TG_CHAT_ID')
 
 
 def create_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('-id', type=str)
+    parser.add_argument('--chat_id', required=False, type=str, default=chat_id)
 
     return parser
 
 
-def posting_spacex_photo(id: str = None):
+def posting_spacex_photo(id: str = None, chat_id=chat_id):
     """
     Публикует одну фотографию по id запуска ракеты , либо из директории.
     :param id: id запуска ракеты
+    :param chat_id: id чата для загрузки фото.
     """
-    chat_id = '@nasa_spacex_images_channel'
-
     bot = telegram.Bot(token=token)
 
     images = read_dirs('images/spacex')
