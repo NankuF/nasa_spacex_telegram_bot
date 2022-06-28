@@ -2,7 +2,7 @@
 
 Порядок действий:
 
-1. Скачайте проект
+1. Скачайте проект<br>
 ```commandline
 git clone https://github.com/NankuF/nasa_spacex_telegram_bot.git
 ```
@@ -11,7 +11,7 @@ git clone https://github.com/NankuF/nasa_spacex_telegram_bot.git
 pip install -r requirements.txt
 ```
 3. Создайте бота, канал и добавьте бота в канал администратором.<br>
-4. Создайте файл `.env` и укажите следующие переменные:
+4. Создайте файл `.env` и укажите следующие переменные:<br>
 ```commandline
 NASA_API_KEY='your_api_key'
 TG_TOKEN='your_telegram_bot_token'
@@ -20,7 +20,7 @@ TG_CHAT_ID='@your_chat_or_channel'
    Ключ для Nasa создается здесь: ``https://api.nasa.gov/`` <br>
    Токен для телеграм-бота создается в телеграме, в канале ``@BotFather``<br>
    Chat_id - ссылка на телеграм-канал, например ``@mychannel``<br>
-5. Запустите один из скриптов для скачивания фотографий.(см. ниже)
+5. Запустите один из скриптов для скачивания фотографий.(см. ниже)<br>
 6. Используйте скрипт для автопостинга в телеграм, указав нужную директорию, либо используйте скрипт для ручного
    постинга фотографий Spacex.(см. ниже)<br>
 
