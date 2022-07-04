@@ -10,64 +10,74 @@ git clone https://github.com/NankuF/nasa_spacex_telegram_bot.git
 ```commandline
 python -m venv venv
 ```
-3. Установите зависимости:<br> 
+3. Перейдите в директорию:
+```commandline
+cd nasa_spacex_telegram_bot
+```
+4. Установите зависимости:<br> 
 ```commandline
 pip install -r requirements.txt
 ```
-3. Создайте бота, канал и добавьте бота в канал администратором.<br>
-4. Создайте файл `.env` и укажите следующие переменные:<br>
+5. Создайте бота, канал и добавьте бота в канал с правами администратора.<br>
+6. Создайте файл `.env` и укажите следующие переменные:<br>
 ```commandline
 NASA_API_KEY='your_api_key'
 TG_TOKEN='your_telegram_bot_token'
-TG_CHAT_ID='@your_chat_or_channel'
 ```
-   Ключ для Nasa создается здесь: ``https://api.nasa.gov/`` <br>
-   Токен для телеграм-бота создается в телеграме, в канале ``@BotFather``<br>
-   Chat_id - ссылка на телеграм-канал, например ``@mychannel``<br>
-5. Запустите один из скриптов для скачивания фотографий.(см. ниже)<br>
+`NASA_API_KEY` - ключ для Nasa создается здесь: https://api.nasa.gov/ <br>
+`TG_TOKEN` - токен для телеграм-бота создается в телеграм-канале: https://t.me/botfather <br>
+7. Запустите один из скриптов для скачивания фотографий.(см. ниже)<br>
 #### Скрипты для скачивания фотографий (Windows)
 
 Результат: скачает указанное количество фотографий.<br>
 
 <b>Spacex:</b><br>
--с - количество фотографий.<br>
---id - id запуска ракеты. Если id не указать, скачает фото с последнего запуска (если есть).<br>
-
+`--сount` - количество фотографий.<br>
+`--id` - id запуска ракеты. Если id не указать, скачает фото с последнего запуска (если есть).<br>
+`--download` - скачать фото (по умолчанию).<br>
+`--no-download` - не скачивать фото.<br>
 ```commandline
- python .\spacex.py -c 1 --id 5eb87cf2ffd86e000604b344
+python spacex.py --count 1 --id 5eb87cf2ffd86e000604b344
 ```
 
 <b>NASA_APOD:</b><br>
--с - количество фотографий.<br>
-
+`--apikey` - ключ к сервисам NASA.<br>
+`--сount` - количество фотографий.<br>
+`--download` - скачать фото (по умолчанию).<br>
+`--no-download` - не скачивать фото.<br>
 ```commandline
- python .\nasa_apod.py -c 1 
+python nasa_apod.py --apikey "DEMO_KEY" --count 1 
 ```
 
 <b>NASA_EPIC:</b><br>
--с - количество фотографий.<br>
-
+`--apikey` - ключ к сервисам NASA.<br>
+`--сount` - количество фотографий.<br>
+`--download` - скачать фото (по умолчанию).<br>
+`--no-download` - не скачивать фото.<br>
 ```commandline
- python .\nasa_epic.py -c 1 
+python nasa_epic.py --apikey "DEMO_KEY" --count 1 --no-download
 ```
 6. Используйте скрипт для автопостинга в телеграм, указав нужную директорию, либо используйте скрипт для ручного
    постинга фотографий Spacex.(см. ниже)<br>
 #### Автопостинг фотографий в телеграм-канал.
-
--h - интервал между публикациями фотографий, в часах.<br>
--d - директория с которой загружаются фотографии.<br>
+`--token` - токен телеграм-бота.<br>
+`--chat_id` - имя вашего телеграм-канала, например ``@mychannel``.<br>
+`--dir` - директория с которой загружаются фотографии.<br>
+`--interval` - интервал между публикациями фотографий, в часах.<br>
 
 ```commandline
-python .\auto_posting.py -h 4 -d /images/nasa_apod 
+python auto_posting.py --token "1234567800:FFHjtoY1pGrk9NGq19LBj1cbe08Hbui9WLx" --chat_id "@nasa_spacex_images_channel" --dir "/images/nasa_apod" --interval 1 
 ```
 
 #### Ручной постинг фотографий Spacex в телеграм-канал.
 
--id - id запуска ракеты.<br>
+`--token` - токен телеграм-бота.<br>
+`--id` - id запуска ракеты.<br>
+`--chat_id` - имя вашего телеграм-канала, например ``@mychannel``.<br>
 
 ```commandline
-python .\posting_spacex_photo.py -id 5eb87d42ffd86e000604b384 
+python posting_spacex_photo.py --token "1234567800:FFHjtoY1pGrk9NGq19LBj1cbe08Hbui9WLx" --id 5eb87d42ffd86e000604b384 --chat_id "@nasa_spacex_images_channel"
 ```
 
-Примечание: id запуска ракеты можно получить из json, обратившись по ссылке
-`https://api.spacexdata.com/v5/launches/past`
+Примечание: id запуска ракеты можно получить из json, перейдя по ссылке:<br>
+https://api.spacexdata.com/v5/launches/past

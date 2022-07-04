@@ -2,62 +2,63 @@ import argparse
 import random
 import sys
 import time
-from datetime import datetime
 
 import environs
 import telegram
 
-from utils import read_dirs
-
-env = environs.Env()
-env.read_env()
-token = env.str('TG_TOKEN')
-chat_id = env.str('TG_CHAT_ID')
+from utils import get_file_paths
 
 
 def create_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-d', '--dir', required=True, type=str)
-    parser.add_argument('--hour', required=True, type=int, default=4)
-    parser.add_argument('--chat_id', required=False, type=str, default=chat_id)
+    parser.add_argument('--token', type=str, required=True, help='токен телеграм-бота')
+    parser.add_argument('--chat_id', type=str, required=True, help='@имя_телеграм_канала')
+    parser.add_argument('--dir', type=str, required=True, help='путь до директории')
+    parser.add_argument('--interval', type=int, default=4, required=True, help='интервал загрузки в часах')
 
     return parser
 
 
-def auto_posting(dir_: str, interval: int, chat_id=chat_id):
+def auto_posting(token: str, chat_id: str, dir_: str, interval: int):
     """
     Публикация фотографий из определенной директории с определенным интервалом в часах.
+    :param token: токен телеграм бота.
+    :param chat_id: название чата для загрузки фото.
     :param dir_: директория, откуда загружать фото. (пример: '/images/nasa_apod').
     :param interval: интервал между публикациями фото, в часах.
-    :param chat_id: id чата для загрузки фото.
     """
     bot = telegram.Bot(token=token)
 
-    images = read_dirs(path=dir_)
-    random.shuffle(images)
-    now, update = datetime.now(), datetime.now()
-    n = 0
+    image_paths = get_file_paths(path=dir_)
+    random.shuffle(image_paths)
+    counter = 1
+    hour = interval * 60 * 60
     while True:
-        time.sleep(60)
-        now = datetime.now()
-        if now.hour - update.hour >= interval:
-            if len(images):
-                bot.send_photo(chat_id=chat_id, photo=open(images[n], 'rb'))
-                print('Фото опубликовано')
-                update = datetime.now()
-                if n >= len(images):
-                    n = 0
-                    random.shuffle(images)
-                else:
-                    n += 1
-            else:
-                print('Нет фотографий.')
+        if not len(image_paths):
+            print('Нет фотографий.')
+            break
+        elif counter > len(image_paths):
+            counter = 1
+            random.shuffle(image_paths)
+        with open(image_paths[counter - 1], 'rb') as image:
+            bot.send_photo(chat_id=chat_id, photo=image)
+        print('Фото опубликовано.')
+        time.sleep(hour)
+        counter += 1
 
 
-if __name__ == '__main__':
+def main(chat_id: str, dir_: str, interval: int):
+    env = environs.Env()
+    env.read_env()
+    token = env.str('TG_TOKEN')
+
     if len(sys.argv) == 1:
-        auto_posting('images/nasa_apod', interval=1)
+        auto_posting(token=token, chat_id=chat_id, dir_=dir_, interval=interval)
     else:
         parser = create_parser()
         namespace = parser.parse_args()
-        auto_posting(dir_=namespace.dir, interval=namespace.hour)
+        auto_posting(token=namespace.token, chat_id=namespace.chat_id, dir_=namespace.dir, interval=namespace.interval)
+
+
+if __name__ == '__main__':
+    main(chat_id='@nasa_spacex_images_channel', dir_='images/nasa_apod', interval=1)

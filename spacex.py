@@ -1,15 +1,18 @@
 import argparse
+import os
 import sys
+from pathlib import Path
 
-from consts import HEADERS
-from utils import download_image, fetch_json, create_dir
+import requests
+
+from utils import download_image
 
 
 def create_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-c', '--count', required=True, type=int)
-    parser.add_argument('--id', type=str)
-    parser.add_argument('--download', required=False, default=True)
+    parser.add_argument('--count', required=True, type=int, help='количество фотографий для скачивания')
+    parser.add_argument('--id', type=str, help='id запуска ракеты')
+    parser.add_argument('--download', default=True, action=argparse.BooleanOptionalAction, help='cкачивать фото')
 
     return parser
 
@@ -22,25 +25,32 @@ def fetch_spacex_images(count: int, id: str = None, download: bool = True) -> [s
     :param id: id запуска.
     :param download: скачать фотографии.
     """
-    spacex_path = create_dir('images/spacex')
+    dirname = 'images/spacex'
+    os.makedirs(dirname, exist_ok=True)
+    spacex_path = Path(os.path.join(os.getcwd(), dirname))
 
     url = 'https://api.spacexdata.com/v5/launches/'
     url = f'{url}{id}' if id else f'{url}latest'
-    spacex_json = fetch_json(url, headers=HEADERS)
+    resp = requests.get(url)
+    resp.raise_for_status()
+    spacex = resp.json()
 
     images_urls = []
-    for image_url in spacex_json['links']['flickr']['original'][:count]:
+    for image_url in spacex['links']['flickr']['original'][:count]:
         if download:
-            download_image(image_url, spacex_path, headers=HEADERS)
+            download_image(image_url, spacex_path)
         images_urls.append(image_url)
     return images_urls
 
 
-if __name__ == '__main__':
+def main(count: int, download: bool, id: str = None):
     if len(sys.argv) == 1:
-        fetch_spacex_images(count=5, download=True)
+        fetch_spacex_images(count=count, download=download, id=id)
     else:
         parser = create_parser()
         namespace = parser.parse_args()
-        fetch_spacex_images(count=namespace.count, id=namespace.id)
+        fetch_spacex_images(count=namespace.count, id=namespace.id, download=namespace.download)
 
+
+if __name__ == '__main__':
+    main(count=1, download=True, id='5eb87d42ffd86e000604b384')
