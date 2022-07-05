@@ -57,16 +57,16 @@ python nasa_apod.py --apikey "DEMO_KEY" --count 1
 ```commandline
 python nasa_epic.py --apikey "DEMO_KEY" --count 1 --no-download
 ```
-6. Используйте скрипт для автопостинга в телеграм, указав нужную директорию, либо используйте скрипт для ручного
+6. Используйте скрипт для автопостинга в телеграм, либо используйте скрипт для ручного
    постинга фотографий Spacex.(см. ниже)<br>
 #### Автопостинг фотографий в телеграм-канал.
+`--apikey` - ключ к сервисам NASA.<br>
 `--token` - токен телеграм-бота.<br>
 `--chat_id` - имя вашего телеграм-канала, например ``@mychannel``.<br>
-`--dir` - директория с которой загружаются фотографии.<br>
 `--interval` - интервал между публикациями фотографий, в часах.<br>
 
 ```commandline
-python auto_posting.py --token "1234567800:FFHjtoY1pGrk9NGq19LBj1cbe08Hbui9WLx" --chat_id "@nasa_spacex_images_channel" --dir "/images/nasa_apod" --interval 1 
+python auto_posting.py --apikey "DEMO_KEY" --token "1234567800:FFHjtoY1pGrk9NGq19LBj1cbe08Hbui9WLx" --chat_id "@nasa_spacex_images_channel" --interval 1 
 ```
 
 #### Ручной постинг фотографий Spacex в телеграм-канал.

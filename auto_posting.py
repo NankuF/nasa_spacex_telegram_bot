@@ -1,64 +1,99 @@
 import argparse
+import logging
 import random
 import sys
+import textwrap as tw
 import time
 
 import environs
 import telegram
 
-from utils import get_file_paths
+from nasa_apod import fetch_nasa_apod_images
+
+logging.basicConfig(format='%(asctime)s - %(name)s - %(threadName)s -  %(levelname)s - %(message)s',
+    filename='errors.log', encoding='utf-8', level=logging.INFO)
 
 
 def create_parser():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--apikey', type=str, required=True, help='ключ API')
     parser.add_argument('--token', type=str, required=True, help='токен телеграм-бота')
     parser.add_argument('--chat_id', type=str, required=True, help='@имя_телеграм_канала')
-    parser.add_argument('--dir', type=str, required=True, help='путь до директории')
     parser.add_argument('--interval', type=int, default=4, required=True, help='интервал загрузки в часах')
 
     return parser
 
 
-def auto_posting(token: str, chat_id: str, dir_: str, interval: int):
+def auto_posting(apikey: str, token: str, chat_id: str, interval: int):
     """
     Публикация фотографий из определенной директории с определенным интервалом в часах.
+    :param apikey: ключ API к сервису NASA.
     :param token: токен телеграм бота.
     :param chat_id: название чата для загрузки фото.
-    :param dir_: директория, откуда загружать фото. (пример: '/images/nasa_apod').
     :param interval: интервал между публикациями фото, в часах.
     """
+    print('Start auto_posting')
     bot = telegram.Bot(token=token)
 
-    image_paths = get_file_paths(path=dir_)
-    random.shuffle(image_paths)
+    images = []
     counter = 1
     hour = interval * 60 * 60
     while True:
-        if not len(image_paths):
-            print('Нет фотографий.')
-            break
-        elif counter > len(image_paths):
+        if not len(images) or counter > len(images):
             counter = 1
-            random.shuffle(image_paths)
-        with open(image_paths[counter - 1], 'rb') as image:
-            bot.send_photo(chat_id=chat_id, photo=image)
-        print('Фото опубликовано.')
+            images = fetch_nasa_apod_images(apikey=apikey, count=100, download=False)
+            random.shuffle(images)
+
+        image_data = {}
+        if len(images[counter - 1].get('title', '')):
+            image_data['title'] = images[counter - 1]['title']
+        if 0 < len(images[counter - 1].get("explanation", '')) <= 1024:
+            image_data['description'] = images[counter - 1]['explanation'].split('digg_url')[0].strip()
+        if len(images[counter - 1].get('copyright', '')):
+            image_data['copyright'] = images[counter - 1]['copyright']
+        if len(images[counter - 1].get('date', '')):
+            image_data['date'] = images[counter - 1]['date']
+
+        message = ''
+        for key, text in image_data.items():
+            if key == 'title':
+                message += f'<b>{text}</b>\n\n'
+                continue
+            if key == 'description':
+                message += f'{text}\n\n'
+                continue
+            message += f'<b>{key}:</b> {text}\n'
+        message = tw.dedent(message)
+
+        try:
+            bot.send_photo(chat_id=chat_id,
+                           photo=images[counter - 1].get('hdurl', 'url'),
+                           caption=message,
+                           parse_mode=telegram.ParseMode.HTML)
+        except telegram.error.BadRequest:
+            counter += 1
+            continue
+        except telegram.error.RetryAfter as exc:
+            time.sleep(exc.retry_after)
+            continue
         time.sleep(hour)
         counter += 1
 
 
-def main(chat_id: str, dir_: str, interval: int):
+def main(chat_id: str, interval: int):
     env = environs.Env()
     env.read_env()
+    apikey = env.str('NASA_API_KEY')
     token = env.str('TG_TOKEN')
 
     if len(sys.argv) == 1:
-        auto_posting(token=token, chat_id=chat_id, dir_=dir_, interval=interval)
+        auto_posting(apikey=apikey, token=token, chat_id=chat_id, interval=interval)
     else:
         parser = create_parser()
         namespace = parser.parse_args()
-        auto_posting(token=namespace.token, chat_id=namespace.chat_id, dir_=namespace.dir, interval=namespace.interval)
+        auto_posting(apikey=namespace.apikey, token=namespace.token, chat_id=namespace.chat_id,
+                     interval=namespace.interval)
 
 
 if __name__ == '__main__':
-    main(chat_id='@nasa_spacex_images_channel', dir_='images/nasa_apod', interval=1)
+    main(chat_id='@nasa_spacex_images_channel', interval=4)

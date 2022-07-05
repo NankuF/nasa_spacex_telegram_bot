@@ -36,12 +36,12 @@ def fetch_nasa_apod_images(apikey: str, count: int, download: bool = True) -> [s
     resp.raise_for_status()
     nasa_apod = resp.json()
 
-    images_urls = []
+    images = []
     for image in nasa_apod:
         if download:
             download_image(image['hdurl'], nasa_apod_path, payload=payload)
-        images_urls.append(image['hdurl'])
-    return images_urls
+        images.append(image)
+    return images
 
 
 def main(count: int, download: bool):
