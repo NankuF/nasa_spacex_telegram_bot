@@ -13,12 +13,12 @@ def create_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('--token', type=str, required=True, help='токен телеграм-бота')
     parser.add_argument('--chat_id', type=str, required=True, help='@имя_телеграм_канала')
-    parser.add_argument('--id', type=str, required=True, help='id запуска ракеты')
+    parser.add_argument('--id', type=str, required=False, help='id запуска ракеты')
 
     return parser
 
 
-def posting_spacex_photo(token: str, chat_id: str, id: str = None):
+def publish_spacex_photo(token: str, chat_id: str, id: str = None):
     """
     Публикует одну фотографию по id запуска ракеты , либо из директории.
     :param token: токен телеграм бота.
@@ -40,18 +40,15 @@ def posting_spacex_photo(token: str, chat_id: str, id: str = None):
             print('Нет фотографий.')
 
 
-def main(chat_id: str, id: str = None):
+if __name__ == '__main__':
     env = environs.Env()
     env.read_env()
     token = env.str('TG_TOKEN')
+    chat_id = '@nasa_spacex_images_channel'
 
     if len(sys.argv) == 1:
-        posting_spacex_photo(token=token, chat_id=chat_id, id=id)
+        publish_spacex_photo(token=token, chat_id=chat_id)
     else:
         parser = create_parser()
         namespace = parser.parse_args()
-        posting_spacex_photo(token=namespace.token, chat_id=namespace.chat_id, id=namespace.id)
-
-
-if __name__ == '__main__':
-    main(chat_id='@nasa_spacex_images_channel', id='5eb87cf2ffd86e000604b344')
+        publish_spacex_photo(token=namespace.token, chat_id=namespace.chat_id, id=namespace.id)

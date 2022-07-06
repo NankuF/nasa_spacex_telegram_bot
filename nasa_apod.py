@@ -44,18 +44,14 @@ def fetch_nasa_apod_images(apikey: str, count: int, download: bool = True) -> [s
     return images_urls
 
 
-def main(count: int, download: bool):
+if __name__ == '__main__':
     env = environs.Env()
     env.read_env()
     nasa_api_key = env.str('NASA_API_KEY')
 
     if len(sys.argv) == 1:
-        fetch_nasa_apod_images(nasa_api_key, count=count, download=download)
+        fetch_nasa_apod_images(apikey=nasa_api_key, count=2, download=True)
     else:
         parser = create_parser()
         namespace = parser.parse_args()
         fetch_nasa_apod_images(apikey=namespace.apikey, count=namespace.count, download=namespace.download)
-
-
-if __name__ == '__main__':
-    main(count=1, download=True)

@@ -19,7 +19,7 @@ def create_parser():
     return parser
 
 
-def auto_posting(token: str, chat_id: str, dir_: str, interval: int):
+def publish_auto(token: str, chat_id: str, dir_: str, interval: int):
     """
     Публикация фотографий из определенной директории с определенным интервалом в часах.
     :param token: токен телеграм бота.
@@ -32,7 +32,7 @@ def auto_posting(token: str, chat_id: str, dir_: str, interval: int):
     image_paths = get_file_paths(path=dir_)
     random.shuffle(image_paths)
     counter = 1
-    hour = interval * 60 * 60
+    hours = interval * 60 * 60
     while True:
         if not len(image_paths):
             print('Нет фотографий.')
@@ -43,22 +43,20 @@ def auto_posting(token: str, chat_id: str, dir_: str, interval: int):
         with open(image_paths[counter - 1], 'rb') as image:
             bot.send_photo(chat_id=chat_id, photo=image)
         print('Фото опубликовано.')
-        time.sleep(hour)
+        time.sleep(hours)
         counter += 1
 
 
-def main(chat_id: str, dir_: str, interval: int):
+if __name__ == '__main__':
     env = environs.Env()
     env.read_env()
     token = env.str('TG_TOKEN')
+    chat_id = '@nasa_spacex_images_channel'
+    dir_ = 'images/nasa_apod'
 
     if len(sys.argv) == 1:
-        auto_posting(token=token, chat_id=chat_id, dir_=dir_, interval=interval)
+        publish_auto(token=token, chat_id=chat_id, dir_=dir_, interval=1)
     else:
         parser = create_parser()
         namespace = parser.parse_args()
-        auto_posting(token=namespace.token, chat_id=namespace.chat_id, dir_=namespace.dir, interval=namespace.interval)
-
-
-if __name__ == '__main__':
-    main(chat_id='@nasa_spacex_images_channel', dir_='images/nasa_apod', interval=1)
+        publish_auto(token=namespace.token, chat_id=namespace.chat_id, dir_=namespace.dir, interval=namespace.interval)

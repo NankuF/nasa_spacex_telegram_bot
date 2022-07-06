@@ -33,24 +33,20 @@ def fetch_spacex_images(count: int, id: str = None, download: bool = True) -> [s
     url = f'{url}{id}' if id else f'{url}latest'
     resp = requests.get(url)
     resp.raise_for_status()
-    spacex = resp.json()
+    spacex_launch = resp.json()
 
     images_urls = []
-    for image_url in spacex['links']['flickr']['original'][:count]:
+    for image_url in spacex_launch['links']['flickr']['original'][:count]:
         if download:
             download_image(image_url, spacex_path)
         images_urls.append(image_url)
     return images_urls
 
 
-def main(count: int, download: bool, id: str = None):
+if __name__ == '__main__':
     if len(sys.argv) == 1:
-        fetch_spacex_images(count=count, download=download, id=id)
+        fetch_spacex_images(count=1, download=True)
     else:
         parser = create_parser()
         namespace = parser.parse_args()
         fetch_spacex_images(count=namespace.count, id=namespace.id, download=namespace.download)
-
-
-if __name__ == '__main__':
-    main(count=1, download=True, id='5eb87d42ffd86e000604b384')

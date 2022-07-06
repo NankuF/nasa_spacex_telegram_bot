@@ -5,16 +5,10 @@ from pathlib import Path
 import requests
 
 
-def fetch_data(url: str, payload: dict = None) -> dict:
-    """Получить данные"""
-    resp = requests.get(url, params=payload)
-    resp.raise_for_status()
-    return resp.json()
-
-
-def fetch_file_extension(url: str):
+def fetch_file_extension(url: str) -> str:
     """Получить расширение файла из url"""
-    return os.path.splitext(url)[1]
+    clear_path = urllib.parse.unquote(urllib.parse.urlsplit(url).path)
+    return os.path.splitext(clear_path)[1]
 
 
 def fetch_filename(url: str) -> str:
@@ -26,16 +20,11 @@ def fetch_filename(url: str) -> str:
 def download_image(url: str, save_path: Path, payload=None):
     """Скачать изображение"""
     resp = requests.get(url, params=payload)
-    filename = fetch_filename(url)
+    filename = f'{fetch_filename(url)}{fetch_file_extension(url)}'
+    path = os.path.join(os.sep, save_path, filename)
 
-    with open(f'{os.path.join(os.sep, save_path, f"{filename}{fetch_file_extension(url)}")}', 'wb') as file:
+    with open(path, 'wb') as file:
         file.write(resp.content)
-
-
-def save_image_urls(url: str, path: Path):
-    path = Path(os.path.join(os.sep, path, 'urls.txt'))
-    with open(path, 'a') as file:
-        file.write(url + '\n')
 
 
 def get_file_paths(path: str) -> [str]:
