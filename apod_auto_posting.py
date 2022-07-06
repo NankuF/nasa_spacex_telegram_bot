@@ -48,7 +48,7 @@ def create_message(images: List[dict], counter: int) -> str:
     return tw.dedent(message)
 
 
-def auto_posting(apikey: str, token: str, chat_id: str, interval: int):
+def publish_auto(apikey: str, token: str, chat_id: str, interval: int):
     """
     Публикация фотографий APOD с определенным интервалом в часах.
 
@@ -62,7 +62,7 @@ def auto_posting(apikey: str, token: str, chat_id: str, interval: int):
 
     images = []
     counter = 1
-    hour = interval * 60 * 60
+    hours = interval * 60 * 60
     while True:
         if not len(images) or counter > len(images):
             counter = 1
@@ -81,7 +81,7 @@ def auto_posting(apikey: str, token: str, chat_id: str, interval: int):
         except telegram.error.RetryAfter as exc:
             time.sleep(exc.retry_after)
             continue
-        time.sleep(hour)
+        time.sleep(hours)
         counter += 1
 
 
@@ -92,11 +92,11 @@ def main(chat_id: str, interval: int):
     token = env.str('TG_TOKEN')
 
     if len(sys.argv) == 1:
-        auto_posting(apikey=apikey, token=token, chat_id=chat_id, interval=interval)
+        publish_auto(apikey=apikey, token=token, chat_id=chat_id, interval=interval)
     else:
         parser = create_parser()
         namespace = parser.parse_args()
-        auto_posting(apikey=namespace.apikey, token=namespace.token, chat_id=namespace.chat_id,
+        publish_auto(apikey=namespace.apikey, token=namespace.token, chat_id=namespace.chat_id,
                      interval=namespace.interval)
 
 

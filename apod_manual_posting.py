@@ -18,7 +18,7 @@ def create_parser():
     return parser
 
 
-def posting_apod_photo(apikey: str, token: str, chat_id: str):
+def publish_apod_photo(apikey: str, token: str, chat_id: str):
     """
     Публикует одну фотографию в телеграм-канал.
 
@@ -55,11 +55,11 @@ def main(chat_id: str):
     token = env.str('TG_TOKEN')
 
     if len(sys.argv) == 1:
-        posting_apod_photo(apikey=apikey, token=token, chat_id=chat_id)
+        publish_apod_photo(apikey=apikey, token=token, chat_id=chat_id)
     else:
         parser = create_parser()
         namespace = parser.parse_args()
-        posting_apod_photo(apikey=namespace.apikey, token=namespace.token, chat_id=namespace.chat_id)
+        publish_apod_photo(apikey=namespace.apikey, token=namespace.token, chat_id=namespace.chat_id)
 
 
 if __name__ == '__main__':
