@@ -1,5 +1,4 @@
 import argparse
-import sys
 import time
 
 import environs
@@ -11,9 +10,9 @@ from nasa_apod import fetch_nasa_apod_images
 
 def create_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--apikey', type=str, required=True, help='ключ API')
-    parser.add_argument('--token', type=str, required=True, help='токен телеграм-бота')
-    parser.add_argument('--chat_id', type=str, required=True, help='@имя_телеграм_канала')
+    parser.add_argument('--apikey', type=str, help='ключ API')
+    parser.add_argument('--token', type=str, help='токен телеграм-бота')
+    parser.add_argument('--chat_id', type=str, help='@имя_телеграм_канала')
 
     return parser
 
@@ -48,19 +47,18 @@ def publish_apod_photo(apikey: str, token: str, chat_id: str):
             continue
 
 
-def main(chat_id: str):
+def main():
     env = environs.Env()
     env.read_env()
-    apikey = env.str('NASA_API_KEY')
-    token = env.str('TG_TOKEN')
 
-    if len(sys.argv) == 1:
-        publish_apod_photo(apikey=apikey, token=token, chat_id=chat_id)
-    else:
-        parser = create_parser()
-        namespace = parser.parse_args()
-        publish_apod_photo(apikey=namespace.apikey, token=namespace.token, chat_id=namespace.chat_id)
+    parser = create_parser()
+    namespace = parser.parse_args()
+    apikey = namespace.apikey or env.str('NASA_API_KEY')
+    token = namespace.token or env.str('TG_TOKEN')
+    chat_id = namespace.chat_id or env.str('CHAT_ID')
+
+    publish_apod_photo(apikey=apikey, token=token, chat_id=chat_id)
 
 
 if __name__ == '__main__':
-    main(chat_id='@nasa_spacex_images_channel')
+    main()

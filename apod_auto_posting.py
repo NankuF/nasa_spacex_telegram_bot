@@ -1,7 +1,6 @@
 import argparse
 import logging
 import random
-import sys
 import textwrap as tw
 import time
 from typing import List
@@ -17,10 +16,10 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(threadName)s -  %(levelna
 
 def create_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--apikey', type=str, required=True, help='ключ API')
-    parser.add_argument('--token', type=str, required=True, help='токен телеграм-бота')
-    parser.add_argument('--chat_id', type=str, required=True, help='@имя_телеграм_канала')
-    parser.add_argument('--interval', type=int, default=4, required=True, help='интервал загрузки в часах')
+    parser.add_argument('--apikey', type=str, help='ключ API')
+    parser.add_argument('--token', type=str, help='токен телеграм-бота')
+    parser.add_argument('--chat_id', type=str, help='@имя_телеграм_канала')
+    parser.add_argument('--interval', type=int, required=True, help='интервал загрузки в часах')
 
     return parser
 
@@ -85,20 +84,18 @@ def publish_auto(apikey: str, token: str, chat_id: str, interval: int):
         counter += 1
 
 
-def main(chat_id: str, interval: int):
+def main():
     env = environs.Env()
     env.read_env()
-    apikey = env.str('NASA_API_KEY')
-    token = env.str('TG_TOKEN')
 
-    if len(sys.argv) == 1:
-        publish_auto(apikey=apikey, token=token, chat_id=chat_id, interval=interval)
-    else:
-        parser = create_parser()
-        namespace = parser.parse_args()
-        publish_auto(apikey=namespace.apikey, token=namespace.token, chat_id=namespace.chat_id,
-                     interval=namespace.interval)
+    parser = create_parser()
+    namespace = parser.parse_args()
+    apikey = namespace.apikey or env.str('NASA_API_KEY')
+    token = namespace.token or env.str('TG_TOKEN')
+    chat_id = namespace.chat_id or env.str('CHAT_ID')
+
+    publish_auto(apikey=apikey, token=token, chat_id=chat_id, interval=namespace.interval)
 
 
 if __name__ == '__main__':
-    main(chat_id='@nasa_spacex_images_channel', interval=4)
+    main()
