@@ -1,6 +1,5 @@
 import argparse
 import os
-import sys
 from pathlib import Path
 
 import environs
@@ -11,14 +10,14 @@ from utils import download_image
 
 def create_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--apikey', required=True, type=str, help='ключ к сервисам NASA')
-    parser.add_argument('--count', required=True, type=int, help='количество фотографий для скачивания')
-    parser.add_argument('--download', default=True, action=argparse.BooleanOptionalAction, help='cкачивать фото')
+    parser.add_argument('--apikey', type=str, help='ключ к сервисам NASA')
+    parser.add_argument('--count', type=int, help='количество фотографий для скачивания')
+    parser.add_argument('--download', action='store_true', help='скачать фотографии')
 
     return parser
 
 
-def fetch_nasa_apod_images(apikey: str, count: int, download: bool = True) -> [str]:
+def fetch_nasa_apod_images(apikey: str, count: int, download: bool = False) -> [str]:
     """
     Получить изображения последних APOD-фото NASA.
     APOD - Astronomy Picture of the Day.
@@ -44,14 +43,17 @@ def fetch_nasa_apod_images(apikey: str, count: int, download: bool = True) -> [s
     return images_urls
 
 
-if __name__ == '__main__':
+def main():
     env = environs.Env()
     env.read_env()
-    nasa_api_key = env.str('NASA_API_KEY')
 
-    if len(sys.argv) == 1:
-        fetch_nasa_apod_images(apikey=nasa_api_key, count=2, download=True)
-    else:
-        parser = create_parser()
-        namespace = parser.parse_args()
-        fetch_nasa_apod_images(apikey=namespace.apikey, count=namespace.count, download=namespace.download)
+    parser = create_parser()
+    namespace = parser.parse_args()
+    nasa_api_key = namespace.apikey or env.str('NASA_API_KEY')
+    count = namespace.count or env.int('APOD_IMAGES_COUNT')
+
+    fetch_nasa_apod_images(apikey=nasa_api_key, count=count, download=namespace.download)
+
+
+if __name__ == '__main__':
+    main()

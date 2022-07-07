@@ -26,16 +26,19 @@ TG_TOKEN='your_telegram_bot_token'
 ```
 `NASA_API_KEY` - ключ для Nasa создается здесь: https://api.nasa.gov/ <br>
 `TG_TOKEN` - токен для телеграм-бота создается в телеграм-канале: https://t.me/botfather <br>
+`APOD_IMAGES_COUNT` - сколько APOD фотографий скачать.<br>
+`EPIC_IMAGES_COUNT` - сколько EPIC фотографий скачать.<br>
+`SPACEX_IMAGES_COUNT` - сколько фотографий запуска ракет SPACEX скачать.<br>
+
 7. Запустите один из скриптов для скачивания фотографий.(см. ниже)<br>
 #### Скрипты для скачивания фотографий
 
 Результат: скачает указанное количество фотографий.<br>
-
+*Большинство ключей не обязательны, если их не указать - подставятся данные из `.env`.*<br>
 <b>Spacex:</b><br>
 `--сount` - количество фотографий.<br>
 `--id` - id запуска ракеты. Если id не указать, скачает фото с последнего запуска (если есть).<br>
-`--download` - скачать фото (по умолчанию).<br>
-`--no-download` - не скачивать фото.<br>
+`--download` - скачать фото, если указан этот ключ<br>
 ```commandline
 python spacex.py --count 1 --id 5eb87cf2ffd86e000604b344
 ```
@@ -43,8 +46,7 @@ python spacex.py --count 1 --id 5eb87cf2ffd86e000604b344
 <b>NASA_APOD:</b><br>
 `--apikey` - ключ к сервисам NASA.<br>
 `--сount` - количество фотографий.<br>
-`--download` - скачать фото (по умолчанию).<br>
-`--no-download` - не скачивать фото.<br>
+`--download` - скачать фото, если указан этот ключ<br>
 ```commandline
 python nasa_apod.py --apikey "DEMO_KEY" --count 1 
 ```
@@ -52,18 +54,17 @@ python nasa_apod.py --apikey "DEMO_KEY" --count 1
 <b>NASA_EPIC:</b><br>
 `--apikey` - ключ к сервисам NASA.<br>
 `--сount` - количество фотографий.<br>
-`--download` - скачать фото (по умолчанию).<br>
-`--no-download` - не скачивать фото.<br>
+`--download` - скачать фото, если указан этот ключ<br>
 ```commandline
-python nasa_epic.py --apikey "DEMO_KEY" --count 1 --no-download
+python nasa_epic.py --apikey "DEMO_KEY" --count 1 --download
 ```
 6. Используйте скрипт для автопостинга в телеграм, указав нужную директорию, либо используйте скрипт для ручного
    постинга фотографий Spacex.(см. ниже)<br>
 #### Автопостинг фотографий в телеграм-канал.
+`--dir` - (обязательно) директория с которой загружаются фотографии.<br>
+`--interval` - (обязательно) интервал между публикациями фотографий, в часах.<br>
 `--token` - токен телеграм-бота.<br>
 `--chat_id` - имя вашего телеграм-канала, например ``@mychannel``.<br>
-`--dir` - директория с которой загружаются фотографии.<br>
-`--interval` - интервал между публикациями фотографий, в часах.<br>
 
 ```commandline
 python auto_posting.py --token "1234567800:FFHjtoY1pGrk9NGq19LBj1cbe08Hbui9WLx" --chat_id "@nasa_spacex_images_channel" --dir "/images/nasa_apod" --interval 1 

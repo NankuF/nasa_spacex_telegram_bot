@@ -1,6 +1,5 @@
 import argparse
 import random
-import sys
 import time
 
 import environs
@@ -11,10 +10,10 @@ from utils import get_file_paths
 
 def create_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--token', type=str, required=True, help='токен телеграм-бота')
-    parser.add_argument('--chat_id', type=str, required=True, help='@имя_телеграм_канала')
     parser.add_argument('--dir', type=str, required=True, help='путь до директории')
-    parser.add_argument('--interval', type=int, default=4, required=True, help='интервал загрузки в часах')
+    parser.add_argument('--interval', type=int, required=True, help='интервал загрузки в часах')
+    parser.add_argument('--token', type=str, help='токен телеграм-бота')
+    parser.add_argument('--chat_id', type=str, help='@имя_телеграм_канала')
 
     return parser
 
@@ -47,16 +46,17 @@ def publish_auto(token: str, chat_id: str, dir_: str, interval: int):
         counter += 1
 
 
-if __name__ == '__main__':
+def main():
     env = environs.Env()
     env.read_env()
-    token = env.str('TG_TOKEN')
-    chat_id = '@nasa_spacex_images_channel'
-    dir_ = 'images/nasa_apod'
 
-    if len(sys.argv) == 1:
-        publish_auto(token=token, chat_id=chat_id, dir_=dir_, interval=1)
-    else:
-        parser = create_parser()
-        namespace = parser.parse_args()
-        publish_auto(token=namespace.token, chat_id=namespace.chat_id, dir_=namespace.dir, interval=namespace.interval)
+    parser = create_parser()
+    namespace = parser.parse_args()
+    token = namespace.token or env.str('TG_TOKEN')
+    chat_id = namespace.chat_id or env.str('CHAT_ID')
+
+    publish_auto(token=token, chat_id=chat_id, dir_=namespace.dir, interval=namespace.interval)
+
+
+if __name__ == '__main__':
+    main()

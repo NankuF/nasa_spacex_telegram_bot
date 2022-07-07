@@ -1,8 +1,8 @@
 import argparse
 import os
-import sys
 from pathlib import Path
 
+import environs
 import requests
 
 from utils import download_image
@@ -10,9 +10,10 @@ from utils import download_image
 
 def create_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--count', required=True, type=int, help='количество фотографий для скачивания')
-    parser.add_argument('--id', type=str, help='id запуска ракеты')
-    parser.add_argument('--download', default=True, action=argparse.BooleanOptionalAction, help='cкачивать фото')
+    parser.add_argument('--count', type=int, help='количество фотографий для скачивания')
+    parser.add_argument('--id', type=str,
+                        help='если указан, скачает фото по id запуска ракеты, иначе скачает фото с последнего запуска')
+    parser.add_argument('--download', action='store_true', help='скачать фотографии')
 
     return parser
 
@@ -43,10 +44,16 @@ def fetch_spacex_images(count: int, id: str = None, download: bool = True) -> [s
     return images_urls
 
 
+def main():
+    env = environs.Env()
+    env.read_env()
+
+    parser = create_parser()
+    namespace = parser.parse_args()
+    count = namespace.count or env.int('SPACEX_IMAGES_COUNT')
+
+    fetch_spacex_images(count=count, id=namespace.id, download=namespace.download)
+
+
 if __name__ == '__main__':
-    if len(sys.argv) == 1:
-        fetch_spacex_images(count=1, download=True)
-    else:
-        parser = create_parser()
-        namespace = parser.parse_args()
-        fetch_spacex_images(count=namespace.count, id=namespace.id, download=namespace.download)
+    main()

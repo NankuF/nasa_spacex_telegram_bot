@@ -1,6 +1,5 @@
 import argparse
 import random
-import sys
 
 import environs
 import telegram
@@ -11,9 +10,9 @@ from utils import get_file_paths
 
 def create_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--token', type=str, required=True, help='токен телеграм-бота')
-    parser.add_argument('--chat_id', type=str, required=True, help='@имя_телеграм_канала')
-    parser.add_argument('--id', type=str, required=False, help='id запуска ракеты')
+    parser.add_argument('--token', type=str, help='токен телеграм-бота')
+    parser.add_argument('--chat_id', type=str, help='@имя_телеграм_канала')
+    parser.add_argument('--id', type=str, help='id запуска ракеты')
 
     return parser
 
@@ -40,15 +39,17 @@ def publish_spacex_photo(token: str, chat_id: str, id: str = None):
             print('Нет фотографий.')
 
 
-if __name__ == '__main__':
+def main():
     env = environs.Env()
     env.read_env()
-    token = env.str('TG_TOKEN')
-    chat_id = '@nasa_spacex_images_channel'
 
-    if len(sys.argv) == 1:
-        publish_spacex_photo(token=token, chat_id=chat_id)
-    else:
-        parser = create_parser()
-        namespace = parser.parse_args()
-        publish_spacex_photo(token=namespace.token, chat_id=namespace.chat_id, id=namespace.id)
+    parser = create_parser()
+    namespace = parser.parse_args()
+    token = namespace.token or env.str('TG_TOKEN')
+    chat_id = namespace.chat_id or env.str('CHAT_ID')
+
+    publish_spacex_photo(token=token, chat_id=chat_id, id=namespace.id)
+
+
+if __name__ == '__main__':
+    main()
