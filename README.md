@@ -10,19 +10,27 @@
 git clone https://github.com/NankuF/nasa_spacex_telegram_bot.git
 ```
 
-2. Создайте виртуальное окружение:<br>
+2. Перейдите в директорию:
+
+```commandline
+cd nasa_spacex_telegram_bot
+```
+3. Создайте виртуальное окружение:<br>
 
 ```commandline
 python -m venv venv
 ```
 
-3. Перейдите в директорию:
-
+4. Активируйте виртуальное окружение:<br>
+Unix
 ```commandline
-cd nasa_spacex_telegram_bot
+. ./venv/bin/activate
 ```
-
-4. Установите зависимости:<br>
+Windows
+```commandline
+. .\venv\Scripts\activate
+```
+5. Установите зависимости:<br>
 
 ```commandline
 pip install -r requirements.txt
@@ -69,5 +77,5 @@ python apod_manual_posting.py --apikey "DEMO_KEY" --token "1234567800:FFHjtoY1pG
 ```
 или
 ```commandline
-python apod_auto_posting.py
+python apod_manual_posting.py
 ```
