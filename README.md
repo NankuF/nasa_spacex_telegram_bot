@@ -7,13 +7,13 @@
 1. Скачайте проект:<br>
 
 ```commandline
-git clone https://github.com/NankuF/nasa_spacex_telegram_bot.git
+git clone https://github.com/NankuF/nasa_telegram_bot.git
 ```
 
 2. Перейдите в директорию:
 
 ```commandline
-cd nasa_spacex_telegram_bot
+cd nasa_telegram_bot
 ```
 3. Создайте виртуальное окружение:<br>
 
