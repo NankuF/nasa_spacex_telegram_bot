@@ -11,7 +11,7 @@ import telegram
 from nasa_apod import fetch_nasa_apod_images
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(threadName)s -  %(levelname)s - %(message)s',
-                    filename='errors.log', encoding='utf-8', level=logging.INFO)
+                    filename='errors.log', level=logging.INFO)
 
 
 def create_parser():
@@ -19,7 +19,7 @@ def create_parser():
     parser.add_argument('--apikey', type=str, help='ключ API')
     parser.add_argument('--token', type=str, help='токен телеграм-бота')
     parser.add_argument('--chat_id', type=str, help='@имя_телеграм_канала')
-    parser.add_argument('--interval', type=int, required=True, help='интервал загрузки в часах')
+    parser.add_argument('--interval', type=int, help='интервал загрузки в часах')
 
     return parser
 
@@ -93,8 +93,9 @@ def main():
     apikey = namespace.apikey or env.str('NASA_API_KEY')
     token = namespace.token or env.str('TG_TOKEN')
     chat_id = namespace.chat_id or env.str('CHAT_ID')
+    interval = namespace.interval or env.int('INTERVAL')
 
-    publish_auto(apikey=apikey, token=token, chat_id=chat_id, interval=namespace.interval)
+    publish_auto(apikey=apikey, token=token, chat_id=chat_id, interval=interval)
 
 
 if __name__ == '__main__':
