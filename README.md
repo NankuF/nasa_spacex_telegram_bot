@@ -39,10 +39,11 @@ pip install -r requirements.txt
 5. Создайте бота, канал и добавьте бота в канал с правами администратора.<br>
 6. Создайте файл `.env` и укажите следующие переменные:<br>
 
-```commandline
-NASA_API_KEY='your_api_key'
-TG_TOKEN='your_telegram_bot_token'
-CHAT_ID='@your_channel'
+```text
+NASA_API_KEY=your_api_key
+TG_TOKEN=your_telegram_bot_token
+CHAT_ID=@your_channel
+INTERVAL=24
 ```
 
 `NASA_API_KEY` - ключ для NASA создается здесь: https://api.nasa.gov/ <br>
@@ -79,4 +80,11 @@ python apod_manual_posting.py --apikey "DEMO_KEY" --token "1234567800:FFHjtoY1pG
 или
 ```commandline
 python apod_manual_posting.py
+```
+
+### Запуск приложения в докере на сервере
+1. Добавить на сервер файл .env
+2. Создать и запустить контейнер 
+```commandline
+docker run -d --name nasa_telegram_bot --restart always --env-file .env nanku/nasa_telegram_bot
 ```
